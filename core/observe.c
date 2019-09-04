@@ -489,7 +489,6 @@ void observe_step(lwm2m_context_t * contextP,
     lwm2m_observed_t * targetP;
 
     fprintf(stderr, "Entering\n");
-    fprintf(stderr, "Object ID: %lu\n", targetP->uri.objectId);
 
     for (targetP = contextP->observedList ; targetP != NULL ; targetP = targetP->next)
     {
