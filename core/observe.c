@@ -1064,7 +1064,6 @@ bool observe_handleNotify(lwm2m_context_t * contextP,
     uint32_t count;
 
     fprintf(stderr, "Entering\n");
-    fprintf(stderr, "observe_handleNotify data with obsID: %lu\n", obsID);
     token_len = coap_get_header_token(message, (const uint8_t **)&tokenP);
     if (token_len != sizeof(uint32_t)) return false;
 
