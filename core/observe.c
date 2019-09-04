@@ -329,8 +329,6 @@ uint8_t observe_setParameters(lwm2m_context_t * contextP,
     LOG_URI(uriP);
     fprintf(stderr, "toSet: %08X, toClear: %08X, minPeriod: %d, maxPeriod: %d, greaterThan: %f, lessThan: %f, step: %f",
             attrP->toSet, attrP->toClear, attrP->minPeriod, attrP->maxPeriod, attrP->greaterThan, attrP->lessThan, attrP->step);
-    fprintf(stderr, "toSet: %08X, toClear: %08X, minPeriod: %d, maxPeriod: %d, greaterThan: %f, lessThan: %f, step: %f",
-            attrP->toSet, attrP->toClear, attrP->minPeriod, attrP->maxPeriod, attrP->greaterThan, attrP->lessThan, attrP->step);
 
     if (!LWM2M_URI_IS_SET_INSTANCE(uriP) && LWM2M_URI_IS_SET_RESOURCE(uriP)) return COAP_400_BAD_REQUEST;
 
@@ -490,7 +488,7 @@ void observe_step(lwm2m_context_t * contextP,
 {
     lwm2m_observed_t * targetP;
 
-    fprintf(stderr, "Entering");
+    fprintf(stderr, "Entering\n");
     fprintf(stderr, "Object ID: %lu\n", targetP->uri.objectId);
 
     for (targetP = contextP->observedList ; targetP != NULL ; targetP = targetP->next)
@@ -667,7 +665,7 @@ void observe_step(lwm2m_context_t * contextP,
                     if (watcherP->parameters != NULL
                      && (watcherP->parameters->toSet & LWM2M_ATTR_FLAG_MIN_PERIOD) != 0)
                     {
-                        fprintf(stderr, "Checking minimal period (%d s)", watcherP->parameters->minPeriod);
+                        LOG_ARG("Checking minimal period (%d s)", watcherP->parameters->minPeriod);
 
                         if (watcherP->lastTime + watcherP->parameters->minPeriod > currentTime)
                         {
@@ -689,7 +687,7 @@ void observe_step(lwm2m_context_t * contextP,
                  && watcherP->parameters != NULL
                  && (watcherP->parameters->toSet & LWM2M_ATTR_FLAG_MAX_PERIOD) != 0)
                 {
-                    fprintf(stderr, "Checking maximal period (%d s)", watcherP->parameters->maxPeriod);
+                    LOG_ARG("Checking maximal period (%d s)", watcherP->parameters->maxPeriod);
 
                     if (watcherP->lastTime + watcherP->parameters->maxPeriod <= currentTime)
                     {
@@ -806,7 +804,7 @@ static lwm2m_observation_t * prv_findObservationByURI(lwm2m_client_t * clientP,
 
 void observe_remove(lwm2m_observation_t * observationP)
 {
-    fprintf(stderr, "Entering");
+    fprintf(stderr, "Entering\n");
     observationP->clientP->observationList = (lwm2m_observation_t *) LWM2M_LIST_RM(observationP->clientP->observationList, observationP->id, NULL);
     lwm2m_free(observationP);
 }
@@ -1065,7 +1063,7 @@ bool observe_handleNotify(lwm2m_context_t * contextP,
     lwm2m_observation_t * observationP;
     uint32_t count;
 
-    fprintf(stderr, "Entering");
+    fprintf(stderr, "Entering\n");
     fprintf(stderr, "observe_handleNotify data with obsID: %lu\n", obsID);
     token_len = coap_get_header_token(message, (const uint8_t **)&tokenP);
     if (token_len != sizeof(uint32_t)) return false;
