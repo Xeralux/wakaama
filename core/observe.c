@@ -706,6 +706,7 @@ void observe_step(lwm2m_context_t * contextP,
                             int res;
 
                             res = lwm2m_data_serialize(&targetP->uri, size, dataP, &(watcherP->format), &buffer);
+                            fprintf(stdout, "%lu\n", (unsigned long)time(NULL)); 
                             fprintf(stderr, "Send data for objectId: %u/%u/%u\n", *(&targetP->uri.objectId),*(&targetP->uri.instanceId),*(&targetP->uri.resourceId));
                             if (res < 0)
                             {
