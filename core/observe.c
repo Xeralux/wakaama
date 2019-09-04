@@ -165,7 +165,7 @@ uint8_t observe_handleRequest(lwm2m_context_t * contextP,
     lwm2m_watcher_t * watcherP;
     uint32_t count;
 
-    fprintf(stderr, "Code: %02X, server status: %s", message->code, STR_STATUS(serverP->status));
+    LOG_ARG(stderr, "Code: %02X, server status: %s", message->code, STR_STATUS(serverP->status));
     LOG_URI(uriP);
 
     coap_get_header_observe(message, &count);
