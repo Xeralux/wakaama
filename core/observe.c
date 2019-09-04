@@ -698,6 +698,7 @@ void observe_step(lwm2m_context_t * contextP,
 
                 if (notify == true)
                 {
+                    fprintf(stderr, "Notify some data\n");
                     if (buffer == NULL)
                     {
                         if (dataP != NULL)
@@ -1052,7 +1053,7 @@ int lwm2m_observe_cancel(lwm2m_context_t * contextP,
 bool observe_handleNotify(lwm2m_context_t * contextP,
                            void * fromSessionH,
                            coap_packet_t * message,
-        				   coap_packet_t * response)
+                           coap_packet_t * response)
 {
     uint8_t * tokenP;
     int token_len;
@@ -1063,7 +1064,7 @@ bool observe_handleNotify(lwm2m_context_t * contextP,
     uint32_t count;
 
     LOG("Entering");
-    fprintf(stderr, "Sending data with obsID: %lu\n", obsID);
+    fprintf(stderr, "observe_handleNotify data with obsID: %lu\n", obsID);
     token_len = coap_get_header_token(message, (const uint8_t **)&tokenP);
     if (token_len != sizeof(uint32_t)) return false;
 
