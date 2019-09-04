@@ -165,7 +165,7 @@ uint8_t observe_handleRequest(lwm2m_context_t * contextP,
     lwm2m_watcher_t * watcherP;
     uint32_t count;
 
-    LOG_ARG(stderr, "Code: %02X, server status: %s", message->code, STR_STATUS(serverP->status));
+    LOG_ARG("Code: %02X, server status: %s", message->code, STR_STATUS(serverP->status));
     LOG_URI(uriP);
 
     coap_get_header_observe(message, &count);
@@ -236,7 +236,7 @@ void observe_cancel(lwm2m_context_t * contextP,
 {
     lwm2m_observed_t * observedP;
 
-    fprintf(stderr, "mid: %d", mid);
+    LOG_ARG("mid: %d", mid);
 
     for (observedP = contextP->observedList;
          observedP != NULL;
@@ -327,7 +327,9 @@ uint8_t observe_setParameters(lwm2m_context_t * contextP,
     lwm2m_watcher_t * watcherP;
 
     LOG_URI(uriP);
-    fprintf(stderr, "toSet: %08X, toClear: %08X, minPeriod: %d, maxPeriod: %d, greaterThan: %f, lessThan: %f, step: %f",
+    fprintf(stderr, "toSet: %08X, toClear: %08X, minPeriod: %d, maxPeriod: %d, greaterThan: %f, lessThan: %f, step: %f\n",
+            attrP->toSet, attrP->toClear, attrP->minPeriod, attrP->maxPeriod, attrP->greaterThan, attrP->lessThan, attrP->step);
+    LOG_ARG("toSet: %08X, toClear: %08X, minPeriod: %d, maxPeriod: %d, greaterThan: %f, lessThan: %f, step: %f",
             attrP->toSet, attrP->toClear, attrP->minPeriod, attrP->maxPeriod, attrP->greaterThan, attrP->lessThan, attrP->step);
 
     if (!LWM2M_URI_IS_SET_INSTANCE(uriP) && LWM2M_URI_IS_SET_RESOURCE(uriP)) return COAP_400_BAD_REQUEST;
@@ -407,7 +409,7 @@ uint8_t observe_setParameters(lwm2m_context_t * contextP,
         }
     }
 
-    fprintf(stderr, "Final toSet: %08X, minPeriod: %d, maxPeriod: %d, greaterThan: %f, lessThan: %f, step: %f",
+    LOG_ARG("Final toSet: %08X, minPeriod: %d, maxPeriod: %d, greaterThan: %f, lessThan: %f, step: %f",
             watcherP->parameters->toSet, watcherP->parameters->minPeriod, watcherP->parameters->maxPeriod, watcherP->parameters->greaterThan, watcherP->parameters->lessThan, watcherP->parameters->step);
 
     return COAP_204_CHANGED;
@@ -430,7 +432,7 @@ lwm2m_observed_t * observe_findByUri(lwm2m_context_t * contextP,
                  if ((!LWM2M_URI_IS_SET_RESOURCE(uriP) && !LWM2M_URI_IS_SET_RESOURCE(&(targetP->uri)))
                      || (LWM2M_URI_IS_SET_RESOURCE(uriP) && LWM2M_URI_IS_SET_RESOURCE(&(targetP->uri)) && (uriP->resourceId == targetP->uri.resourceId)))
                  {
-                     fprintf(stderr, "Found one with%s observers.", targetP->watcherList ? "" : " no");
+                     LOG_ARG("Found one with%s observers.", targetP->watcherList ? "" : " no");
                      LOG_URI(&(targetP->uri));
                      return targetP;
                  }
@@ -439,7 +441,7 @@ lwm2m_observed_t * observe_findByUri(lwm2m_context_t * contextP,
         targetP = targetP->next;
     }
 
-    fprintf(stderr, "Found nothing");
+    LOG("Found nothing");
     return NULL;
 }
 
@@ -464,14 +466,14 @@ void lwm2m_resource_value_changed(lwm2m_context_t * contextP,
                 {
                     lwm2m_watcher_t * watcherP;
 
-                    fprintf(stderr, "Found an observation");
+                    LOG("Found an observation");
                     LOG_URI(&(targetP->uri));
 
                     for (watcherP = targetP->watcherList ; watcherP != NULL ; watcherP = watcherP->next)
                     {
                         if (watcherP->active == true)
                         {
-                            fprintf(stderr, "Tagging a watcher");
+                            LOG("Tagging a watcher");
                             watcherP->update = true;
                         }
                     }
@@ -488,8 +490,7 @@ void observe_step(lwm2m_context_t * contextP,
 {
     lwm2m_observed_t * targetP;
 
-    fprintf(stderr, "Entering\n");
-
+    LOG("Entering");
     for (targetP = contextP->observedList ; targetP != NULL ; targetP = targetP->next)
     {
         lwm2m_watcher_t * watcherP;
@@ -555,7 +556,7 @@ void observe_step(lwm2m_context_t * contextP,
                     {
                         // no conditions
                         notify = true;
-                        fprintf(stderr, "Notify with no conditions");
+                        LOG("Notify with no conditions");
                         LOG_URI(&(targetP->uri));
                     }
 
@@ -565,7 +566,7 @@ void observe_step(lwm2m_context_t * contextP,
                     {
                         if ((watcherP->parameters->toSet & LWM2M_ATTR_FLAG_LESS_THAN) != 0)
                         {
-                            fprintf(stderr, "Checking lower threshold");
+                            LOG("Checking lower threshold");
                             // Did we cross the lower threshold ?
                             switch (dataP->type)
                             {
@@ -575,7 +576,7 @@ void observe_step(lwm2m_context_t * contextP,
                                  || (integerValue >= watcherP->parameters->lessThan
                                   && watcherP->lastValue.asInteger < watcherP->parameters->lessThan))
                                 {
-                                    fprintf(stderr, "Notify on lower threshold crossing");
+                                    LOG("Notify on lower threshold crossing");
                                     notify = true;
                                 }
                                 break;
@@ -585,7 +586,7 @@ void observe_step(lwm2m_context_t * contextP,
                                  || (floatValue >= watcherP->parameters->lessThan
                                   && watcherP->lastValue.asFloat < watcherP->parameters->lessThan))
                                 {
-                                    fprintf(stderr, "Notify on lower threshold crossing");
+                                    LOG("Notify on lower threshold crossing");
                                     notify = true;
                                 }
                                 break;
@@ -595,7 +596,7 @@ void observe_step(lwm2m_context_t * contextP,
                         }
                         if ((watcherP->parameters->toSet & LWM2M_ATTR_FLAG_GREATER_THAN) != 0)
                         {
-                            fprintf(stderr, "Checking upper threshold");
+                            LOG("Checking upper threshold");
                             // Did we cross the upper threshold ?
                             switch (dataP->type)
                             {
@@ -605,7 +606,7 @@ void observe_step(lwm2m_context_t * contextP,
                                  || (integerValue >= watcherP->parameters->greaterThan
                                   && watcherP->lastValue.asInteger < watcherP->parameters->greaterThan))
                                 {
-                                    fprintf(stderr, "Notify on lower upper crossing");
+                                    LOG("Notify on lower upper crossing");
                                     notify = true;
                                 }
                                 break;
@@ -615,7 +616,7 @@ void observe_step(lwm2m_context_t * contextP,
                                  || (floatValue >= watcherP->parameters->greaterThan
                                   && watcherP->lastValue.asFloat < watcherP->parameters->greaterThan))
                                 {
-                                    fprintf(stderr, "Notify on lower upper crossing");
+                                    LOG("Notify on lower upper crossing");
                                     notify = true;
                                 }
                                 break;
@@ -625,7 +626,7 @@ void observe_step(lwm2m_context_t * contextP,
                         }
                         if ((watcherP->parameters->toSet & LWM2M_ATTR_FLAG_STEP) != 0)
                         {
-                            fprintf(stderr, "Checking step");
+                            LOG("Checking step");
 
                             switch (dataP->type)
                             {
@@ -637,7 +638,7 @@ void observe_step(lwm2m_context_t * contextP,
                                 if ((diff < 0 && (0 - diff) >= watcherP->parameters->step)
                                  || (diff >= 0 && diff >= watcherP->parameters->step))
                                 {
-                                    fprintf(stderr, "Notify on step condition");
+                                    LOG("Notify on step condition");
                                     notify = true;
                                 }
                             }
@@ -650,7 +651,7 @@ void observe_step(lwm2m_context_t * contextP,
                                 if ((diff < 0 && (0 - diff) >= watcherP->parameters->step)
                                  || (diff >= 0 && diff >= watcherP->parameters->step))
                                 {
-                                    fprintf(stderr, "Notify on step condition");
+                                    LOG("Notify on step condition");
                                     notify = true;
                                 }
                             }
@@ -675,7 +676,7 @@ void observe_step(lwm2m_context_t * contextP,
                         }
                         else
                         {
-                            fprintf(stderr, "Notify on minimal period");
+                            LOG("Notify on minimal period");
                             notify = true;
                         }
                     }
@@ -690,14 +691,14 @@ void observe_step(lwm2m_context_t * contextP,
 
                     if (watcherP->lastTime + watcherP->parameters->maxPeriod <= currentTime)
                     {
-                        fprintf(stderr, "Notify on maximal period");
+                        LOG("Notify on maximal period");
+                        fprintf(stderr, "Send data max period\n");
                         notify = true;
                     }
                 }
 
                 if (notify == true)
                 {
-                    fprintf(stderr, "Notify some data\n");
                     if (buffer == NULL)
                     {
                         if (dataP != NULL)
@@ -705,6 +706,7 @@ void observe_step(lwm2m_context_t * contextP,
                             int res;
 
                             res = lwm2m_data_serialize(&targetP->uri, size, dataP, &(watcherP->format), &buffer);
+                            fprintf(stderr, "Send data for obj ID: %lu\n", &targetP->uri.objectId);
                             if (res < 0)
                             {
                                 break;
@@ -803,7 +805,7 @@ static lwm2m_observation_t * prv_findObservationByURI(lwm2m_client_t * clientP,
 
 void observe_remove(lwm2m_observation_t * observationP)
 {
-    fprintf(stderr, "Entering\n");
+    LOG("Entering");
     observationP->clientP->observationList = (lwm2m_observation_t *) LWM2M_LIST_RM(observationP->clientP->observationList, observationP->id, NULL);
     lwm2m_free(observationP);
 }
@@ -914,7 +916,7 @@ int lwm2m_observe(lwm2m_context_t * contextP,
     lwm2m_observation_t * observationP;
     uint8_t token[4];
 
-    fprintf(stderr, "clientID: %d", clientID);
+    LOG_ARG("clientID: %d", clientID);
     LOG_URI(uriP);
 
     if (!LWM2M_URI_IS_SET_INSTANCE(uriP) && LWM2M_URI_IS_SET_RESOURCE(uriP)) return COAP_400_BAD_REQUEST;
@@ -989,7 +991,7 @@ int lwm2m_observe_cancel(lwm2m_context_t * contextP,
     lwm2m_client_t * clientP;
     lwm2m_observation_t * observationP;
 
-    fprintf(stderr, "clientID: %d", clientID);
+    LOG_ARG("clientID: %d", clientID);
     LOG_URI(uriP);
 
     clientP = (lwm2m_client_t *)lwm2m_list_find((lwm2m_list_t *)contextP->clientList, clientID);
@@ -1052,7 +1054,7 @@ int lwm2m_observe_cancel(lwm2m_context_t * contextP,
 bool observe_handleNotify(lwm2m_context_t * contextP,
                            void * fromSessionH,
                            coap_packet_t * message,
-                           coap_packet_t * response)
+        				   coap_packet_t * response)
 {
     uint8_t * tokenP;
     int token_len;
@@ -1062,7 +1064,7 @@ bool observe_handleNotify(lwm2m_context_t * contextP,
     lwm2m_observation_t * observationP;
     uint32_t count;
 
-    fprintf(stderr, "Entering\n");
+    LOG("Entering");
     token_len = coap_get_header_token(message, (const uint8_t **)&tokenP);
     if (token_len != sizeof(uint32_t)) return false;
 
