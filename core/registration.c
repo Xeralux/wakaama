@@ -262,6 +262,7 @@ static uint8_t prv_register(lwm2m_context_t * contextP,
     if (server->sessionH == NULL)
     {
         server->sessionH = lwm2m_connect_server(server->secObjInstID, contextP->userData);
+        fprintf(stderr, "REGISTER ON SERVER: %u\n", server->shortID);
     }
 
     if (NULL == server->sessionH)
@@ -481,12 +482,15 @@ uint8_t registration_start(lwm2m_context_t * contextP)
     targetP = contextP->serverList;
     while (targetP != NULL && result == COAP_NO_ERROR)
     {
+        fprintf(stderr, "WAIT 28s BEFORE REGISTRATION...\n");
+        sleep(28);
         if (targetP->status == STATE_DEREGISTERED
          || targetP->status == STATE_REG_FAILED)
         {
             result = prv_register(contextP, targetP);
         }
         targetP = targetP->next;
+        fprintf(stderr, "REGISTRATION DONE\n");
     }
 
     return result;
