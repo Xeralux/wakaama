@@ -1,3 +1,6 @@
 [submodule "tinydtls"]
 	path = tinydtls
 	url = https://github.com/eclipse/tinydtls
+[submodule "examples/shared/tinydtls"]
+	path = examples/shared/tinydtls
+	url = https://github.com/eclipse/tinydtls
